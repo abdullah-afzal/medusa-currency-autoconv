@@ -1,32 +1,21 @@
-import {  CurrencyService
+import {  
     type ScheduledJobConfig, 
     type ScheduledJobArgs,
+    Logger
   }  from "@medusajs/medusa"
-import CurrencyConverterService from "../services/currencyconverter"
-import ExchangeRateService from "../services/exchangerate"
+  import UpdateProductsPricesService from "../services/updateproductsprices"
 
   export default async function handler({ 
     container, 
     data, 
     pluginOptions,
   }: ScheduledJobArgs) {
-      const currencyconverterService = container.resolve<CurrencyConverterService>(
-          "currencyconverterService"
-          )
-          const exchangeRateService = container.resolve<ExchangeRateService>(
-              "exchangeRateService"
-              )
-              const currencyService = container.resolve<CurrencyService>(
-                  "currencyService"
-                  )
-    
-    const currencies = await Promise.all((pluginOptions.SupportedCurrencies as string[]).map(async (currency) => 
-         await currencyService.retrieveByCode(currency)
-    ));
-    const buffer:number= pluginOptions.Buffer as number;
-    const base_currency=await  currencyService.retrieveByCode((pluginOptions.BaseCurrency as any).code)
-    const currenciesrates= await exchangeRateService.upsertRate( base_currency,currencies,buffer)
-    await currencyconverterService.ConvertCurrencies(base_currency,currenciesrates)
+      const updateproductsPricesservice = container.resolve<UpdateProductsPricesService>("updateproducstprices")
+      const logger = container.resolve<Logger>("logger")
+
+    logger.info("Starting update rates job...")
+    await updateproductsPricesservice.updateProductsPrices()
+    this.logger.info("Rates updated successfully")
   }
   
   export const config: ScheduledJobConfig = {
