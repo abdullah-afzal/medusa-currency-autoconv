@@ -1,6 +1,6 @@
 import { ProductVariantService, TransactionBaseService, Logger ,Currency } from "@medusajs/medusa";
 import { MoneyAmountRepository } from "@medusajs/medusa/dist/repositories/money-amount";
-import {CurrencyExchangeRate} from "../models/exchangerates"
+import {CurrencyExchangeRate} from "../models/currency-exchange-rate"
 import { EntityManager } from "typeorm";
 
 type InjectedDependencies = {
