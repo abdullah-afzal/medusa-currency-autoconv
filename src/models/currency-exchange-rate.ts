@@ -1,11 +1,17 @@
-import { BeforeInsert,BeforeUpdate, Column, Entity, PrimaryColumn, OneToOne } from "typeorm";
+import { BeforeInsert,BeforeUpdate, Column, Entity, OneToOne, JoinColumn } from "typeorm";
 import { generateEntityId } from "@medusajs/utils";
 import { BaseEntity, Currency } from "@medusajs/medusa";
 
 @Entity()
 export class CurrencyExchangeRate extends BaseEntity {
-    @PrimaryColumn()
-    @OneToOne(() => Currency)
+
+
+
+    @Column({nullable:false})
+    code: string;
+
+    @OneToOne(() => Currency,{nullable:false})
+    @JoinColumn({name:"code"})
     currency: Currency;
 
     @Column({ type: 'float' })
