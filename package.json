@@ -5,11 +5,13 @@
   "author": "Benzekri Mohammed islam",
   "license": "MIT",
   "keywords": [
-    "Payment",
+    "auto conversion",
     "medusa-plugin",
-    "tabby",
-    "medusa-plugin-payment",
+    "currency-conversion",
     "medusa"
+  ],
+  "files": [
+    "dist"
   ],
   "scripts": {
     "clean": "cross-env ./node_modules/.bin/rimraf dist",

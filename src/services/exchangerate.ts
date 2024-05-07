@@ -41,8 +41,34 @@ class ExchangeRateService extends TransactionBaseService {
     }
 
 
-    async upsertRate(baseCurrency: Currency,  targetCurrencies: Currency[],buffer: number = 0.05): Promise<Partial<CurrencyExchangeRate>[]|undefined> {
+    async upsertRate(manualRates: Partial<CurrencyExchangeRate>[],baseCurrency: Currency,  targetCurrencies: Currency[],buffer: number = 0.05): Promise<Partial<CurrencyExchangeRate>[]|undefined> {
         try {
+            const updatedRates: Partial<CurrencyExchangeRate>[] = [];
+            for (const manualRate of manualRates) {
+                const existingRate = await this.currencyExchangeRateRepository.findOne({
+                    where: { code: manualRate.code },
+                });
+                if (existingRate) {
+                    existingRate.rate = manualRate.rate;
+                    existingRate.expires_at = manualRate.expires_at;
+                    await this.currencyExchangeRateRepository.save(existingRate);
+                    updatedRates.push(existingRate);
+                }
+            }
+    
+            // Create new records for missing manual currencies
+            const missingCurrencies = manualRates.filter(currency => !updatedRates.some(rate => rate.code === currency.code));
+            const newRates = missingCurrencies.map(currency => {
+                return this.currencyExchangeRateRepository.create({
+                    code: currency.code,
+                    rate: currency.rate,
+                    expires_at: currency.expires_at
+                });
+            });
+            const newres =await this.currencyExchangeRateRepository.save(newRates);
+
+
+
             const targetCurrenciesCodes = targetCurrencies.map((currency) => currency.code);
             const currentRates = await this.currencyExchangeRateRepository.find({ where: { code: In(targetCurrenciesCodes) }, relations: ["currency"]});
             const ratesToUpdate = currentRates.filter((rate) => {
@@ -52,18 +78,6 @@ class ExchangeRateService extends TransactionBaseService {
             const ratesToCreate = targetCurrencies.filter((currency) => {
                 return ! currentRates.some((rate) => rate.currency.code === currency.code) ;
             });
-
-
-
-            console.log('********************************')
-            console.log(`targetCurrencies: ${JSON.stringify(targetCurrencies) }`);
-            console.log('********************************')
-            console.log(`currentRates: ${JSON.stringify(currentRates)}`);
-            console.log('********************************')
-            console.log(`ratesToUpdate: ${JSON.stringify(ratesToUpdate)}`);
-            console.log('********************************')
-            console.log(`ratesToCreate: ${JSON.stringify(ratesToCreate)}`);
-            console.log('********************************')
 
             if(ratesToUpdate.length === 0 && ratesToCreate.length === 0) {
                 return ;
@@ -88,8 +102,6 @@ class ExchangeRateService extends TransactionBaseService {
 
                 });
             }) ;
-            console.log('********************************')
-            console.log(`rates: ${JSON.stringify(rates)}`);
             await this.currencyExchangeRateRepository.save(rates);
 
             return rates;

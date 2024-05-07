@@ -2,6 +2,7 @@ import {  TransactionBaseService, Logger ,CurrencyService } from "@medusajs/medu
 import ExchangeRateService from "./exchangerate";
 import CurrencyConverterService from "./currencyconverter"
 import { PluginOptions } from "../types/types";
+import { CurrencyExchangeRate } from "../models/currency-exchange-rate";
 
 export default class UpdateProductsPricesService extends TransactionBaseService {
     private currencyService: CurrencyService;
@@ -24,8 +25,9 @@ export default class UpdateProductsPricesService extends TransactionBaseService 
         await this.currencyService.retrieveByCode(currency)
         ));
         const buffer:number= this.pluginOptions.Buffer;
+        const manualRates: Partial<CurrencyExchangeRate>[] = this.pluginOptions.manualRates;
         const base_currency=await  this.currencyService.retrieveByCode(this.pluginOptions.BaseCurrency )
-        const currenciesrates= await this.exchangeRateService.upsertRate( base_currency,currencies,buffer)
+        const currenciesrates= await this.exchangeRateService.upsertRate( manualRates, base_currency,currencies,buffer)
         if (currenciesrates){
             await this.currencyconverterService.ConvertCurrencies(base_currency,currenciesrates)
         }
