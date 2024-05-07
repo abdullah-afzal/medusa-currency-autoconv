@@ -26,7 +26,9 @@ export default class UpdateProductsPricesService extends TransactionBaseService 
         const buffer:number= this.pluginOptions.Buffer;
         const base_currency=await  this.currencyService.retrieveByCode(this.pluginOptions.BaseCurrency )
         const currenciesrates= await this.exchangeRateService.upsertRate( base_currency,currencies,buffer)
-        await this.currencyconverterService.ConvertCurrencies(base_currency,currenciesrates)
+        if (currenciesrates){
+            await this.currencyconverterService.ConvertCurrencies(base_currency,currenciesrates)
+        }
     }
 
 }
