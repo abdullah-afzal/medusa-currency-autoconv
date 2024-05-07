@@ -35,11 +35,11 @@ class CurrencyConverterService extends TransactionBaseService {
                     const dest_price_index = productVariant.prices?.findIndex((price) => price.currency_code === dest_currency.currency.code);
                     this.logger.info(`base_price_index: ${base_price_index}`);
                     this.logger.info(`dest_price_index: ${dest_price_index}`);
-                    if (base_price_index >= 0 && dest_price_index < 0) {
+                    if (base_price_index >= 0 ) {
                         this.logger.info(`we are in`);
                         const base_price = productVariant.prices[base_price_index].amount;
                         const dest_price_amount = Math.ceil(base_price * dest_currency.rate);
-
+                        
                         await this.productVariantService_.upsertCurrencyPrices([
                             {
                                 variantId: productVariant.id,
