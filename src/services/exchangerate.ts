@@ -14,6 +14,7 @@ class ExchangeRateService extends TransactionBaseService {
     private apiKey: string;
     private currencyExchangeRateRepository: typeof CurrencyExchangeRateRepository;
     private pluginOptions : PluginOptions;
+    private manualRates: Partial<CurrencyExchangeRate>[];
 
     constructor(container, pluginOptions) { 
         
@@ -23,6 +24,7 @@ class ExchangeRateService extends TransactionBaseService {
         this.apiKey = this.pluginOptions.api_key;
         this.api = new Freecurrencyapi(this.apiKey);
         this.currencyExchangeRateRepository = container.currencyExchangeRateRepository;
+        this.manualRates = this.pluginOptions.manualRates;
     }
     /**
     * @deprecated This method is deprecated, use `upsertRate` instead.
@@ -39,7 +41,7 @@ class ExchangeRateService extends TransactionBaseService {
     }
 
 
-    async upsertRate(baseCurrency: Currency,  targetCurrencies: Currency[],buffer: number = 0.05): Promise<Partial<CurrencyExchangeRate>[]> {
+    async upsertRate(baseCurrency: Currency,  targetCurrencies: Currency[],buffer: number = 0.05): Promise<Partial<CurrencyExchangeRate>[]|undefined> {
         try {
             const targetCurrenciesCodes = targetCurrencies.map((currency) => currency.code);
             const currentRates = await this.currencyExchangeRateRepository.find({ where: { code: In(targetCurrenciesCodes) }, relations: ["currency"]});
@@ -48,28 +50,48 @@ class ExchangeRateService extends TransactionBaseService {
                 return isexpired;
             });
             const ratesToCreate = targetCurrencies.filter((currency) => {
-                return ! currentRates.some((rate) => rate.currency === currency) ;
+                return ! currentRates.some((rate) => rate.currency.code === currency.code) ;
             });
 
 
 
+            console.log('********************************')
+            console.log(`targetCurrencies: ${JSON.stringify(targetCurrencies) }`);
+            console.log('********************************')
+            console.log(`currentRates: ${JSON.stringify(currentRates)}`);
+            console.log('********************************')
+            console.log(`ratesToUpdate: ${JSON.stringify(ratesToUpdate)}`);
+            console.log('********************************')
+            console.log(`ratesToCreate: ${JSON.stringify(ratesToCreate)}`);
+            console.log('********************************')
+
+            if(ratesToUpdate.length === 0 && ratesToCreate.length === 0) {
+                return ;
+            }
             const currenciresToUpdate = ratesToUpdate.map((rate) => rate.currency.code);
             currenciresToUpdate.push(...ratesToCreate.map((rate) => rate.code));
             const response = await this.api.latest({base_currency: baseCurrency.code,currencies: currenciresToUpdate});
             const rates = Object.entries(response.data).map(([currency, rate]) => {
+
                 if(ratesToUpdate.some((rate) => rate.currency.code === currency.toLowerCase())) {
                     return {
                         currency: targetCurrencies.find((targetCurrency) => targetCurrency.code === currency.toLowerCase())
                         , rate: safeRate(Number(rate), buffer)
                         , id: ratesToUpdate.find((rate) => rate.currency.code === currency.toLowerCase()).id
+                        ,expires_at: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 )
                     } as Partial<CurrencyExchangeRate>; 
                 }
                 return  this.currencyExchangeRateRepository.create( {
                     currency: targetCurrencies.find((targetCurrency) => targetCurrency.code === currency.toLowerCase())
                     , rate: safeRate(Number(rate), buffer)
+                    ,expires_at: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 )
+
                 });
             }) ;
+            console.log('********************************')
+            console.log(`rates: ${JSON.stringify(rates)}`);
             await this.currencyExchangeRateRepository.save(rates);
+
             return rates;
         } catch (error) {
             this.logger.error('Failed to update exchange rate:', error);
