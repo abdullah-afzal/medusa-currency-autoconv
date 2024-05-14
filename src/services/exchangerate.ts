@@ -1,5 +1,6 @@
 import { TransactionBaseService, Currency, Logger } from "@medusajs/medusa";
 import CurrencyExchangeRateRepository from "../repositories/currency-exchange-rate";
+import ManualRateRepository from "../repositories/manual-rate";
 import { CurrencyExchangeRate } from "../models/currency-exchange-rate";
 import Freecurrencyapi from "../helpers/freecurrencyapi";
 import {safeRate} from "../helpers/rate";
@@ -13,6 +14,7 @@ class ExchangeRateService extends TransactionBaseService {
     private api:  Freecurrencyapi;
     private apiKey: string;
     private currencyExchangeRateRepository: typeof CurrencyExchangeRateRepository;
+    private manualRateRepository: typeof ManualRateRepository
     private pluginOptions : PluginOptions;
     private manualRates: Partial<CurrencyExchangeRate>[];
 
@@ -24,6 +26,7 @@ class ExchangeRateService extends TransactionBaseService {
         this.apiKey = this.pluginOptions.api_key;
         this.api = new Freecurrencyapi(this.apiKey);
         this.currencyExchangeRateRepository = container.currencyExchangeRateRepository;
+        this.manualRateRepository =  container.manualRateRepository;
         this.manualRates = this.pluginOptions.manualRates;
     }
     /**
@@ -41,8 +44,10 @@ class ExchangeRateService extends TransactionBaseService {
     }
 
 
-    async upsertRate(manualRates: Partial<CurrencyExchangeRate>[],baseCurrency: Currency,  targetCurrencies: Currency[],buffer: number = 0.05): Promise<Partial<CurrencyExchangeRate>[]|undefined> {
+    async upsertRate(baseCurrency: Currency,  targetCurrencies: Currency[],buffer: number = 0.05): Promise<Partial<CurrencyExchangeRate>[]|undefined> {
         try {
+            const manualRates= await this.manualRateRepository.find();
+            
             const updatedRates: Partial<CurrencyExchangeRate>[] = [];
             for (const manualRate of manualRates) {
                 const existingRate = await this.currencyExchangeRateRepository.findOne({
