@@ -1,6 +1,6 @@
 {
   "name": "medusa-currency-autoconv",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "template plugin for Medusa",
   "author": "Benzekri Mohammed islam",
   "license": "MIT",
@@ -14,13 +14,10 @@
     "dist"
   ],
   "scripts": {
-    "clean": "cross-env ./node_modules/.bin/rimraf dist",
+    "prepare": "cross-env NODE_ENV=production yarn run build",
+    "test": "jest --passWithNoTests src",
     "build": "tsc -p ./tsconfig.server.json && medusa-admin bundle",
-    "build:server": "cross-env npm run clean && tsc -p tsconfig.json",
-    "build:admin": "cross-env medusa-admin build",
-    "watch": "cross-env tsc --watch",
-    "test": "cross-env jest",
-    "prepare": "cross-env NODE_ENV=production npm run build:server "
+    "watch": "tsc --watch"
   },
   "dependencies": {
     "@everapi/freecurrencyapi-js": "^1.0.1",
