@@ -3,11 +3,12 @@ import {
   Container,
   Heading,
   Select,
-  CurrencyInput,
+  // CurrencyInput,
+  Input,
   DatePicker,
   Label,
 } from "@medusajs/ui";
-import { ArrowLeft } from "@medusajs/icons";
+// import { ArrowLeft } from "@medusajs/icons";
 import { useNavigate, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAdminCurrencies, useAdminCustomPost } from "medusa-react";
@@ -69,7 +70,8 @@ const AddRate = () => {
         style={{ display: "inline-flex", alignItems: "center", margin: "15px" }}
       >
         <Link to={"/a/rates"} className="gap-x-2 flex flex-center">
-          <ArrowLeft /> Back to Rates
+          {/* <ArrowLeft />  */}
+          Back to Rates
         </Link>
       </div>
 
@@ -100,9 +102,13 @@ const AddRate = () => {
 
             <Label>Add Rate for Selected Currency:</Label>
             <div className="max-w-[250px]">
-              <CurrencyInput
+              {/* <CurrencyInput
                 symbol={symbol}
                 code={code}
+                disabled={code == null}
+                onChange={(e) => handleRateChange(e.target.value)}
+              /> */}
+              <Input
                 disabled={code == null}
                 onChange={(e) => handleRateChange(e.target.value)}
               />

@@ -3,11 +3,12 @@ import {
   Container,
   Heading,
   Select,
-  CurrencyInput,
+  // CurrencyInput,
+  Input,
   DatePicker,
   Label,
 } from "@medusajs/ui";
-import { ArrowLeft } from "@medusajs/icons";
+// import { ArrowLeft } from "@medusajs/icons";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
@@ -87,7 +88,8 @@ const EditRate = () => {
         style={{ display: "inline-flex", alignItems: "center", margin: "15px" }}
       >
         <Link to={"/a/rates"} className="gap-x-2 flex flex-center">
-          <ArrowLeft /> Back to Rates
+          {/* <ArrowLeft />  */}
+          Back to Rates
         </Link>
       </div>
       <Container>
@@ -118,11 +120,16 @@ const EditRate = () => {
 
             <Label>Add Rate for Selected Currency:</Label>
             <div className="max-w-[250px]">
-              <CurrencyInput
+              {/* <CurrencyInput
                 symbol={symbol}
                 code={code}
                 disabled={code == null}
                 value={rate}
+                onChange={(e) => handleRateChange(e.target.value)}
+              /> */}
+              <Input
+                value={rate}
+                disabled={code == null}
                 onChange={(e) => handleRateChange(e.target.value)}
               />
             </div>

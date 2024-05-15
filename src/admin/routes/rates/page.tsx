@@ -25,11 +25,11 @@ const Rates = () => {
     <>
       <Toaster />
       <Container title="Rates" className="mb-5">
-        <Tabs defaultValue="manual">
+        {/* <Tabs defaultValue="manual">
           <Tabs.List>
             <Tabs.Trigger value="manual">Manual Rates</Tabs.Trigger>
           </Tabs.List>
-          <Tabs.Content value="manual">
+          <Tabs.Content value="manual"> */}
             <header style={{ marginLeft: "90%", marginBottom: "2%" }}>
               <Button
                 variant="transparent"
@@ -85,8 +85,8 @@ const Rates = () => {
                 </div>
               )}
             </main>
-          </Tabs.Content>
-        </Tabs>
+          {/* </Tabs.Content>
+        </Tabs> */}
       </Container>
     </>
   );
