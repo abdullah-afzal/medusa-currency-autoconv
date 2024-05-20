@@ -1,12 +1,12 @@
 import {
   Button,
   Container,
-  Heading,
-  Select,
+  // Heading,
+  // Select,
   // CurrencyInput,
-  Input,
-  DatePicker,
-  Label,
+  // Input,
+  // DatePicker,
+  // Label,
 } from "@medusajs/ui";
 // import { ArrowLeft } from "@medusajs/icons";
 import { useParams, useNavigate, Link } from "react-router-dom";
@@ -63,8 +63,8 @@ const EditRate = () => {
     setRate(value);
   };
 
-  const handleDateChange = (date) => {
-    setExpiryDate(date);
+  const handleDateChange = (e) => {
+    setExpiryDate(e.target.value);
   };
 
   const handleSave = () => {
@@ -95,11 +95,11 @@ const EditRate = () => {
       <Container>
         <div className="mx-auto max-w-5xl">
           <div className="overflow-y-auto px-24 py-8 flex flex-col gap-y-4">
-            <Heading level="h1">Add manual settings for a currency</Heading>
+            <h1>Add manual settings for a currency</h1>
 
-            <Label>Select Currency from Drop down to add</Label>
+            <label>Select Currency from Drop down to add</label>
             <div className="w-[256px]">
-              <Select
+              {/* <Select
                 onValueChange={(selectedCurrency) =>
                   handleCurrencyUpdate(selectedCurrency)
                 }
@@ -115,10 +115,21 @@ const EditRate = () => {
                     </Select.Item>
                   ))}
                 </Select.Content>
-              </Select>
+              </Select> */}
+
+              <select onChange={(e) => handleCurrencyUpdate(e.target.value)}>
+                <option value={code} disabled selected>
+                  Select a currency
+                </option>
+                {currencies?.map((item) => (
+                  <option key={item.code} value={item.code}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <Label>Add Rate for Selected Currency:</Label>
+            <label>Add Rate for Selected Currency:</label>
             <div className="max-w-[250px]">
               {/* <CurrencyInput
                 symbol={symbol}
@@ -127,19 +138,25 @@ const EditRate = () => {
                 value={rate}
                 onChange={(e) => handleRateChange(e.target.value)}
               /> */}
-              <Input
+              <input
                 value={rate}
                 disabled={code == null}
                 onChange={(e) => handleRateChange(e.target.value)}
               />
             </div>
 
-            <Label>Add Expiry Date </Label>
+            <label>Add Expiry Date </label>
             <div className="w-[250px]">
-              <DatePicker
+              {/* <DatePicker
                 placeholder="Pick a date"
                 onChange={handleDateChange}
                 value={expiryDate}
+              /> */}
+
+              <input
+                type="date"
+                value={expiryDate}
+                onChange={handleDateChange}
               />
             </div>
             <Button onClick={handleSave}>Save</Button>

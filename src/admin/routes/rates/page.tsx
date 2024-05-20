@@ -11,7 +11,6 @@ import {
   Button,
   Table,
   DropdownMenu,
-  Tabs,
 } from "@medusajs/ui";
 import { useNavigate } from "react-router-dom";
 import { useAdminCustomPost, useAdminCustomQuery } from "medusa-react";
@@ -21,9 +20,9 @@ const Rates = () => {
   const { data, refetch, isLoading } = useAdminCustomQuery(`/manual-rates`, [
     "get_manual_rates",
   ]);
+  console.log(data)
   return (
     <>
-      <Toaster />
       <Container title="Rates" className="mb-5">
         {/* <Tabs defaultValue="manual">
           <Tabs.List>
@@ -64,7 +63,6 @@ const Rates = () => {
                               <Table.Row
                                 key={rate.id}
                                 className="[&_td:last-child]:w-[1%] [&_td:last-child]:whitespace-nowrap"
-                                // onClick={() => navigate(`${rate.id}`)}
                               >
                                 <Table.Cell>{rate.code}</Table.Cell>
                                 <Table.Cell>{rate.rate}</Table.Cell>
